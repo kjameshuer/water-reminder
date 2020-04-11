@@ -23,12 +23,12 @@ export const init = () => {
             (txn, res) => { },
             (_, error) => console.log("Error creating water_settings table", error)
         );
-        txn.executeSql(
-            "insert into water_entries (drinkable, amount) values ('water', ?)",
-            [Math.floor(Math.random() * 1000)],
-            (txn, res) => { },
-            (_, error) => console.log("Error inserting water_entries table", error)
-        );
+        // txn.executeSql(
+        //     "insert into water_entries (drinkable, amount) values ('water', ?)",
+        //     [0],
+        //     (txn, res) => { },
+        //     (_, error) => console.log("Error inserting water_entries table", error)
+        // );
     },
         error => console.log("transaction error")
     )
@@ -57,13 +57,13 @@ export const queryEntries = entry_date_range => {
     });
 }
 
-export const addToDailyDrinkTotal = num => {
+export const addToDailyDrinkTotal = (num, type) => {
 
     const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
-                "insert into water_entries (drinkable, amount) values ('water', ?)",
-                [300],
+                "insert into water_entries (amount, drinkable) values (?, ?)",
+                [num, type],
                 (txn, res) => {
                     txn.executeSql(
                         "SELECT sum(amount) as sum FROM water_entries where created_at > date('now','start of day')",

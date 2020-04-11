@@ -1,12 +1,12 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { ProgressCircle } from 'react-native-svg-charts'
 import { ScrollView } from 'react-native-gesture-handler';
-import { MonoText } from '../components/StyledText';
 import windowObject from '../constants/Layout';
-
-import { addToDailyDrinkTotal } from '../helpers/Database'
+import items from '../constants/LiquidAmounts'
+import ButtonGrid from '../components/ButtonGrid';
+import { addToDailyDrinkTotal } from '../helpers/Database';
 
 export default function HomeScreen() {
 
@@ -17,15 +17,17 @@ export default function HomeScreen() {
   }, [])
 
 
-  const handleOnDrinkPress = () => {
-    let dbcall = addToDailyDrinkTotal(amount)
+  const handleOnDrinkPress = (num, type) => {
+    let dbcall = addToDailyDrinkTotal(num, type)
     dbcall
       .then(sum => setAmount(sum / 2000))
       .catch(errorMsg => console.log("promise error ", errorMsg));
   }
 
+  const color = (amount > 1) ? 'rgb(0, 150, 136)' : 'rgb(134, 65, 244)';
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
 
       {/* <View>
           <Image
@@ -40,27 +42,22 @@ export default function HomeScreen() {
 
       <View style={styles.progress_circle_holder}>
         <ProgressCircle
+          style={{ height: 380, width: windowObject.window.width - 40 }}
           progress={amount}
-          progressColor={'rgb(134, 65, 244)'}
-          strokeWidth={5}
-       />
-
-        <Text style={styles.water_amount}>{amount}</Text>
+          progressColor={color}
+          strokeWidth={15}
+        />
+        <Text style={{...styles.water_amount, color: color}}>{amount}</Text>
       </View>
 
-      <TouchableOpacity onPress={handleOnDrinkPress}><Text style={styles.drink_button}>I drank</Text></TouchableOpacity>
-
-
-
-    </View>
+      <ButtonGrid handleFunction={handleOnDrinkPress} items={items} />
+    </ScrollView>
   );
 }
 
 HomeScreen.navigationOptions = {
   header: null,
 };
-
-
 
 const mainColor = 'rgb(134, 65, 244)'
 
@@ -76,11 +73,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
-  drink_button: {
-    padding: 10
-  },
   water_amount: {
-    color: mainColor,
     padding: 0,
     margin: 0,
     fontSize: 40,
@@ -89,8 +82,6 @@ const styles = StyleSheet.create({
   },
   progress_circle_holder: {
     position: 'relative',
-    height: 350,
-    width: windowObject.window.width,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',

@@ -1,5 +1,14 @@
-export default {
-    'Coffee': 350,
-    'Bottle': 700,
-    'Glass': 425
-};
+export default [
+    {
+        name: 'Coffee',
+        value: 350
+    },
+    {
+        name: 'Bottle',
+        value: 750
+    },
+    {
+        name: 'Glass',
+        value: 425
+    }
+];
