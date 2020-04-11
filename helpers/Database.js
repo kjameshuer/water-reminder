@@ -29,6 +29,7 @@ export const init = () => {
               if (res.rows.length === 0) {
                 txn.executeSql("INSERT INTO settings (daily_goal) VALUES (:daily_goal)", [2000]);
               }
+              return db   
               console.log("Db after insert: ", db)
           }, 
           function(error, error2){
@@ -38,7 +39,27 @@ export const init = () => {
 
       console.log("Db after transaction: ", db)
       
-    });    
+    }); 
+ 
+}
+
+export const querySettings = (db) => {
+    console.log("possibly undefined", db)
+    db.transaction(function(txn) {
+        txn.executeSql(
+            "SELECT * FROM settings", 
+            [], 
+            function(tx, res) {
+                console.log("settings rows", res.rows)
+            }, 
+            function(error, error2){
+                console.log("Error: ", error, error2)
+            }
+        );
+
+      console.log("Db after transaction: ", db)
+      
+    }); 
 }
 
 export const dropTables = () => {

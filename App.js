@@ -7,7 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 //     import SQLite from 'react-native-sqlite-2';
 // const db = SQLite.openDatabase('test.db', '1.0', '', 1);
-import {init} from './helpers/Database';
+import * as Database from './helpers/Database';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
@@ -18,10 +18,11 @@ export default function App(props) {
   const [initialNavigationState, setInitialNavigationState] = React.useState();
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
+  const db = Database.init();
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
-    init()
+    Database.querySettings(db);
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide();
