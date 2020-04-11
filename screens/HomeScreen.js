@@ -4,28 +4,42 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { ScrollView } from 'react-native-gesture-handler';
 import { ProgressChart } from "react-native-chart-kit";
 import { MonoText } from '../components/StyledText';
-import windowObject  from '../constants/Layout';
+import windowObject from '../constants/Layout';
+
+import { addToDailyDrinkTotal } from '../helpers/Database'
+
 export default function HomeScreen() {
 
+  const [amount, setAmount] = React.useState(0)
+
+  React.useEffect(() => {
+    setAmount(0)
+  }, [])
+
   const data = {
-    labels: ["Amount", "Goal"], // optional
-    data: [0.4, 0.6]
+    labels: ["Goal", "Amount"], // optional
+    data: [0.6, amount]
   };
   const chartConfig = {
-    backgroundColor: "#e26a00",
-    backgroundGradientFrom: "#fb8c00",
-    backgroundGradientTo: "#ffa726",
+    backgroundColor: '#3abbac',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#000000',
     decimalPlaces: 2,
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: {
-      borderRadius: 16
-    },
-    propsForDots: {
-      r: "6",
-      strokeWidth: "6",
-      stroke: "#ffffff"
+      borderRadius: 5,
     }
+  }
+
+  const handleOnDrinkPress = () => {
+    console.log("amount ", amount)
+    let dbcall = addToDailyDrinkTotal(amount)
+    dbcall
+      .then(sum => setAmount(sum/2000))
+      .catch(errorMsg => console.log("promise error ", errorMsg));
+
+    
+    
   }
 
   return (
@@ -52,10 +66,10 @@ export default function HomeScreen() {
           />
         </View>
 
-  
+        <TouchableOpacity onPress={handleOnDrinkPress}><Text style={styles.drink_button}>I drank</Text></TouchableOpacity>
       </ScrollView>
 
-    
+
     </View>
   );
 }
@@ -116,6 +130,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.05)',
     borderRadius: 3,
     paddingHorizontal: 4,
+  },
+  drink_button: {
+    padding: 10
   },
   getStartedText: {
     fontSize: 17,
