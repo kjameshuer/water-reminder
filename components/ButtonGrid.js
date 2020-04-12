@@ -9,7 +9,10 @@ const ButtonGrid = ({ handleFunction, items }) => {
                 const { name, value } = item;
                 return (
                     <TouchableOpacity style={styles.drink_button} key={name} onPress={() => handleFunction(value, name)}>
-                        <Text >{name}</Text>
+                        <Image
+                            source={require('../assets/images/coffee-icon.png')}
+                            style={styles.welcomeImage}
+                        />
                     </TouchableOpacity>
                 )
             })}
@@ -27,7 +30,11 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     drink_button: {
-      padding: 10
+        padding: 10
+    },
+    welcomeImage: {
+        maxWidth: 60,
+        maxHeight: 60
     }
 })
 

@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { ProgressCircle } from 'react-native-svg-charts'
 import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
@@ -29,17 +29,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
 
-      {/* <View>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-dev.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View> */}
-
+    
       <View style={styles.progress_circle_holder}>
         <ProgressCircle
           style={{ height: 380, width: windowObject.window.width - 40 }}
@@ -68,7 +58,7 @@ const styles = StyleSheet.create({
   },
   welcomeImage: {
     width: 100,
-    height: 80,
+    height: 100,
     resizeMode: 'contain',
     marginTop: 3,
     marginLeft: -10,
