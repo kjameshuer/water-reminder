@@ -20,7 +20,7 @@ export default function HomeScreen() {
   const handleOnDrinkPress = (num, type) => {
     let dbcall = addToDailyDrinkTotal(num, type)
     dbcall
-      .then(sum => setAmount(sum / 2000))
+      .then(sum => setAmount(sum / 2000.00))
       .catch(errorMsg => console.log("promise error ", errorMsg));
   }
 
