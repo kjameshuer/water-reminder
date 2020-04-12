@@ -36,10 +36,10 @@ export default function App(props) {
 
         Database.dropTables();
         Database.init();
-        // let dbcall = Database.queryEntries('day'); // 'day', 'week', 'month'
-        // dbcall
-        //   .then(entries => console.log('water entries from db: ', entries))
-        //   .catch(errorMsg => console.log("entries promise error ", errorMsg));
+        let dbcall = Database.queryEntries('week'); // 'day', 'week', 'month'
+        dbcall
+          .then(entries => null) //console.log('water entries from db: ', entries))
+          .catch(errorMsg => console.log("entries promise error ", errorMsg));
 
 
       } catch (e) {

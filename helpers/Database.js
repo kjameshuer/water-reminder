@@ -1,4 +1,3 @@
-// import SQLite from "react-native-sqlite-2";
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase("water.db", "1.0", "", 1);
@@ -25,32 +24,26 @@ export const init = () => {
             (txn, res) => { },
             (_, error) => console.log("Error creating water_settings table", error)
         );
+
+        // add fake data
         // txn.executeSql(
         //     "insert into water_entries (drinkable, amount) values ('water', ?)",
-        //     [0],
+        //     [Math.floor(Math.random() * 100)],
         //     (txn, res) => { },
         //     (_, error) => console.log("Error inserting water_entries table", error)
         // );
-
-        // add fake data
-        txn.executeSql(
-            "insert into water_entries (drinkable, amount) values ('water', ?)",
-            [Math.floor(Math.random() * 100)],
-            (txn, res) => { },
-            (_, error) => console.log("Error inserting water_entries table", error)
-        );
-        txn.executeSql(
-            "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, datetime('now', 'localtime','-7 days','start of day','weekday 0'))",
-                        [Math.floor(Math.random() * 100)],
-            (txn, res) => { },
-            (_, error) => console.log("Error inserting week water_entries table", error)
-        );
-        txn.executeSql(
-            "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, datetime('now','localtime','start of month'))",
-            [Math.floor(Math.random() * 100)],
-            (txn, res) => { },
-            (_, error) => console.log("Error inserting month water_entries table", error)
-        );
+        // txn.executeSql(
+        //     "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, datetime('now', 'localtime','-7 days','start of day','weekday 2'))",
+        //                 [Math.floor(Math.random() * 100)],
+        //     (txn, res) => { },
+        //     (_, error) => console.log("Error inserting week water_entries table", error)
+        // );
+        // txn.executeSql(
+        //     "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, datetime('now','localtime','start of month','+1 day'))",
+        //     [Math.floor(Math.random() * 100)],
+        //     (txn, res) => { },
+        //     (_, error) => console.log("Error inserting month water_entries table", error)
+        // );
     },
         error => console.log("transaction error")
     )
@@ -68,25 +61,25 @@ export const querySettings = () => {
     });
 }
 
-export const queryEntries = startDate => {
-    let startDateSql = "datetime('now','localtime','start of day'))"
-    switch (startDate) {
+export const queryEntries = startDay => {
+    let startDaySql = "SELECT * FROM water_entries where created_at > "
+    switch (startDay) {
         case "week":
-            // 0 = Sunday, 1 = Monday
-            startDateSql = "datetime('now', 'localtime','-7 days','start of day','weekday 0'))"
+            startDaySql = startDaySql + "datetime('now', 'localtime','-7 days','start of day','weekday 0')"
             break; 
         case "month":
-            startDateSql = "datetime('now','localtime','start of month'))"
+            startDaySql = startDaySql + "datetime('now','localtime','start of month')"
             break;
         default:
-            startDateSql = "datetime('now','localtime','start of day'))"
+            // day
+            startDaySql = startDaySql + "datetime('now','localtime','start of day')"
     }
 
     const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
-                "SELECT * FROM water_entries where created_at > ?",
-                [startDateSql],
+                startDaySql,
+                [],
                 (txn, res) => {
                     resolve(res.rows._array)
                 },
