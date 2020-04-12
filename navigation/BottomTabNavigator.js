@@ -49,7 +49,7 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
-      return 'How to get started';
+      return 'Gotta drink, Bitch!';
     case 'Links':
       return 'Links to learn more';
   }

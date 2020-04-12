@@ -18,7 +18,6 @@ export const registerForPushNotificationsAsync = async () => {
       console.log('Failed to get push token for push notification!');
       return;
     }
-
     token = await Notifications.getExpoPushTokenAsync();
     console.log("notification token **: ", token);
     return token;

@@ -41,17 +41,15 @@ export default function App(props) {
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
         });
 
-        Database.dropAndCreateTables();
-        Database.addFakeData();
-        setPushNotificationToken(await Notifications.registerForPushNotificationsAsync());
+        await Database.dropAndCreateTables();
+        await Database.initializeSettings();
+        await Database.addFakeData();
+
+       // setPushNotificationToken(await Notifications.registerForPushNotificationsAsync());
 
         // setNotificationSubscription(Notifications.notificationListener);
 
-        let dbcall = Database.queryEntries('week'); // 'day', 'week', 'month'
-        dbcall
-          .then(entries => null) //console.log('water entries from db: ', entries))
-          .catch(errorMsg => console.log("entries promise error ", errorMsg));
-
+        const weeklyEntries = await Database.queryEntries('week'); // 'day', 'week', 'month'
 
       } catch (e) {
         // We might want to provide this error information to an error reporting service
