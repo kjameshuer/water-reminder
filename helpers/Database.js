@@ -40,13 +40,13 @@ export const init = () => {
             (_, error) => console.log("Error inserting water_entries table", error)
         );
         txn.executeSql(
-            "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, date('now','weekday 0'))",
-            [Math.floor(Math.random() * 100)],
+            "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, datetime('now', 'localtime','-7 days','start of day','weekday 0'))",
+                        [Math.floor(Math.random() * 100)],
             (txn, res) => { },
             (_, error) => console.log("Error inserting week water_entries table", error)
         );
         txn.executeSql(
-            "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, date('now','start of month'))",
+            "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, datetime('now','localtime','start of month'))",
             [Math.floor(Math.random() * 100)],
             (txn, res) => { },
             (_, error) => console.log("Error inserting month water_entries table", error)
@@ -69,23 +69,23 @@ export const querySettings = () => {
 }
 
 export const queryEntries = startDate => {
-    let startDateSql = "'start of day'"
+    let startDateSql = "datetime('now','localtime','start of day'))"
     switch (startDate) {
         case "week":
             // 0 = Sunday, 1 = Monday
-            startDateSql = "'start of day','weekday 0'"
+            startDateSql = "datetime('now', 'localtime','-7 days','start of day','weekday 0'))"
             break; 
         case "month":
-            startDateSql = "'start of month'"
+            startDateSql = "datetime('now','localtime','start of month'))"
             break;
         default:
-            startDateSql = "'start of day'"
+            startDateSql = "datetime('now','localtime','start of day'))"
     }
 
     const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
-                "SELECT * FROM water_entries where created_at > date('now',?)",
+                "SELECT * FROM water_entries where created_at > ?",
                 [startDateSql],
                 (txn, res) => {
                     resolve(res.rows._array)
