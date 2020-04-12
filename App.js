@@ -34,8 +34,8 @@ export default function App(props) {
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
         });
 
-        Database.dropTables();
-        Database.init();
+        Database.dropAndCreateTables();
+        Database.addFakeData();
         let dbcall = Database.queryEntries('week'); // 'day', 'week', 'month'
         dbcall
           .then(entries => null) //console.log('water entries from db: ', entries))

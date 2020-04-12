@@ -6,11 +6,11 @@ const ButtonGrid = ({ handleFunction, items }) => {
     return (
         <View style={styles.ButtonGrid}>
             {items.map(item => {
-                const { name, value } = item;
+                const { name, value, icon } = item;
                 return (
                     <TouchableOpacity style={styles.drink_button} key={name} onPress={() => handleFunction(value, name)}>
                         <Image
-                            source={require('../assets/images/coffee-icon.png')}
+                            source={icon}
                             style={styles.welcomeImage}
                         />
                     </TouchableOpacity>

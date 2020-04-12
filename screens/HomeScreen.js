@@ -6,7 +6,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
-import { addToDailyDrinkTotal } from '../helpers/Database';
+import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
 
 export default function HomeScreen() {
 
@@ -16,20 +16,16 @@ export default function HomeScreen() {
     setAmount(0)
   }, [])
 
-
-  const handleOnDrinkPress = (num, type) => {
-    let dbcall = addToDailyDrinkTotal(num, type)
-    dbcall
-      .then(sum => setAmount(sum / 2000.00))
-      .catch(errorMsg => console.log("promise error ", errorMsg));
+  const handleOnDrinkPress = async (num, type) => {
+    const sum = await addToDailyDrinkTotal(num, type)
+    const goal = await querySetting('water_goal');
+    setAmount(sum / goal);
   }
 
   const color = (amount > 1) ? 'rgb(0, 150, 136)' : 'rgb(134, 65, 244)';
 
   return (
     <ScrollView style={styles.container}>
-
-    
       <View style={styles.progress_circle_holder}>
         <ProgressCircle
           style={{ height: 380, width: windowObject.window.width - 40 }}
@@ -37,9 +33,9 @@ export default function HomeScreen() {
           progressColor={color}
           strokeWidth={15}
         />
-        <Text style={{...styles.water_amount, color: color}}>{amount}</Text>
+        <Text style={{ ...styles.water_amount, color }}>{amount}</Text>
+        <Text style={{ ...styles.water_measurement, color }}>{'ml'}</Text>
       </View>
-
       <ButtonGrid handleFunction={handleOnDrinkPress} items={items} />
     </ScrollView>
   );
@@ -69,6 +65,14 @@ const styles = StyleSheet.create({
     fontSize: 40,
     position: 'absolute',
     textAlign: 'center'
+  },
+  water_measurement: {
+    padding: 0,
+    margin: 0,
+    fontSize: 30,
+    position: 'absolute',
+    textAlign: 'center',
+    top: '55%'
   },
   progress_circle_holder: {
     position: 'relative',
