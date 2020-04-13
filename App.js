@@ -15,10 +15,10 @@ const Stack = createStackNavigator();
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
-  const [pushNotificationToken, setPushNotificationToken] = React.useState('');
-  // ExponentPushToken[AGpAbsEP-jLF6l5HPMIYN_]
-  const [notification, setNotification] = React.useState({});
-  const [notificationSubscription, setNotificationSubscription] = React.useState();
+  // const [pushNotificationToken, setPushNotificationToken] = React.useState('');
+  // // ExponentPushToken[AGpAbsEP-jLF6l5HPMIYN_]
+  // const [notification, setNotification] = React.useState({});
+  // const [notificationSubscription, setNotificationSubscription] = React.useState();
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
  
@@ -42,15 +42,15 @@ export default function App(props) {
         });
 
         await Database.dropAndCreateTables();
-        await Database.initializeSettings();
+        let settingsId = await Database.initializeSettings();
         await Database.addFakeData();
-
+        // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
        // setPushNotificationToken(await Notifications.registerForPushNotificationsAsync());
 
         // setNotificationSubscription(Notifications.notificationListener);
 
-        const weeklyEntries = await Database.queryEntries('week'); // 'day', 'week', 'month'
-
+        const weeklyEntries = await Database.queryAllSettings(); // 'day', 'week', 'month'
+        console.log("the settgings: ", weeklyEntries)
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);

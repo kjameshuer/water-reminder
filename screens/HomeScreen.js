@@ -17,7 +17,7 @@ export default function HomeScreen() {
   React.useEffect(() => {
     setAmount(0)
     const getGoal = async () => {
-      setGoal(await querySetting('water_goal'));
+      setGoal(await querySetting('goal'));
     }
     getGoal();
   }, [])
