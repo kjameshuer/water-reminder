@@ -31,7 +31,7 @@ export const updateSettings = async (settingsId, settingsHash) => {
         }
     }
     settingsSQL = settingsSQL.substring(0, settingsSQL.length - 1) + " WHERE ID = " + settingsId;
-    console.log("seettings sql for updating: ", settingsSQL)
+    
     const noValue = new Promise((resolve, reject) => {
         db.transaction((txn) => {
         txn.executeSql(
@@ -123,7 +123,7 @@ export const queryEntries = async startDay => {
 
 export const addToDailyDrinkTotal = async (num, type) => {
 
-    const promise = new Promise((resolve, reject) => {
+     const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
                 "insert into water_entries (amount, drinkable) values (?, ?)",
@@ -143,8 +143,8 @@ export const addToDailyDrinkTotal = async (num, type) => {
         });
     })
 
-    const value = await promise;
-    return value;
+    const dailySum = await promise;
+    return dailySum;
 }
 
 export const dropAndCreateTables = async () => {
@@ -178,7 +178,7 @@ export const dropAndCreateTables = async () => {
             txn.executeSql(
               `create table if not exists water_settings (
                     id INTEGER PRIMARY KEY NOT NULL,
-                    goal VARCHAR(30), 
+                    goal INTEGER, 
                     measurement VARCHAR(30),
                     frequency VARCHAR(30), 
                     sunday INTEGER(1), 
@@ -222,7 +222,7 @@ export const initializeSettings = async () => {
                             sunday, monday, tuesday, wednesday, thursday, friday, saturday, 
                             startTime, endTime 
                         ) values (
-                            2000.0, 'ml', 'auto', 
+                            '2000.0', 'ml', 'auto', 
                             1, 1, 1, 1, 1, 1, 1, 
                             time('08:00:00'), time('22:00:00')
                         )`,

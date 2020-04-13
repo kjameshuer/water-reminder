@@ -7,7 +7,7 @@ import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
 import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({navigation,route}) {
 
   const [amount, setAmount] = React.useState(0)
   const [sum, setSum] = React.useState(0)
@@ -23,8 +23,7 @@ export default function HomeScreen({navigation}) {
 
   const handleOnDrinkPress = async (num, type) => {
     const sum = await addToDailyDrinkTotal(num, type)
-
-    setAmount(sum / goal);
+    setAmount(sum / goal.toFixed(1));
     setSum(sum)
   }
 
