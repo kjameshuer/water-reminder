@@ -1,14 +1,13 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 import { ProgressCircle } from 'react-native-svg-charts'
 import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
 import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
-
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
 
   const [amount, setAmount] = React.useState(0)
   const [sum, setSum] = React.useState(0)
@@ -35,7 +34,7 @@ export default function HomeScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.progress_circle_holder}>
         <ProgressCircle
-          style={{ height: 380, width: windowObject.window.width - 40 }}
+          style={{ height: 320, width: windowObject.window.width - 40 }}
           progress={amount}
           progressColor={color}
           strokeWidth={15} />
@@ -48,6 +47,7 @@ export default function HomeScreen() {
         </View>
       </View>
       <ButtonGrid handleFunction={handleOnDrinkPress} items={items} />
+      <Button title={'Settings'} onPress={()=>navigation.navigate('Settings')}></Button>
     </ScrollView>
   );
 }

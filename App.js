@@ -8,7 +8,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import * as Database from './helpers/Database';
 import * as Notifications from './helpers/Notifications';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
+import SettingsScreen from './screens/SettingsScreen'
 import useLinking from './navigation/useLinking';
+
 
 const Stack = createStackNavigator();
 
@@ -72,6 +74,7 @@ export default function App(props) {
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
           <Stack.Navigator>
             <Stack.Screen name="Root" component={BottomTabNavigator} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>
