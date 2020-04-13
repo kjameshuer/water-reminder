@@ -63,7 +63,6 @@ const SettingsScreen = () => {
                     >
                         <Picker.Item label="mL" value="ml" />
                         <Picker.Item label="oz" value="oz" />
-                        <Picker.Item label="cups" value="cups" />
                     </Picker>
 
                     <Text>Notification Frequency</Text>

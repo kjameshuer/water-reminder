@@ -45,14 +45,14 @@ export default function App(props) {
 
         await Database.dropAndCreateTables();
         let settingsId = await Database.initializeSettings();
-        await Database.addFakeData();
+        // await Database.addFakeData();
         // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
        // setPushNotificationToken(await Notifications.registerForPushNotificationsAsync());
 
         // setNotificationSubscription(Notifications.notificationListener);
+        
 
-        const weeklyEntries = await Database.queryAllSettings(); // 'day', 'week', 'month'
-        console.log("the settgings: ", weeklyEntries)
+        // const weeklyEntries = await Database.queryEntries('week'); // 'day', 'week', 'month'
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
