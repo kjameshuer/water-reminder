@@ -1,91 +1,93 @@
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase("water.db", "1.0", "", 1);
-export const addFakeData = async () => {
 
-    // const promise = new Promise((resolve, reject) => {
-    //     db.transaction(txn => {
-    //         // add fake data
-    //         // drank today
-
-    //         // a week ago
-    //         // txn.executeSql(
-    //         //     "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, datetime('now', 'localtime','-7 days','start of day','weekday 2'))",
-    //         //                 [Math.floor(Math.random() * 100)],
-    //         //     (txn, res) => { },
-    //         //     (_, error) => console.log("Error inserting week water_entries table", error)
-    //         // );
-    //         // a month ago
-    //         // txn.executeSql(
-    //         //     "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, datetime('now','localtime','start of month','+1 day'))",
-    //         //     [Math.floor(Math.random() * 100)],
-    //         //     (txn, res) => { },
-    //         //     (_, error) => console.log("Error inserting month water_entries table", error)
-    //         // );
-    //     },
-    //         error => reject("transaction error")
-    //     )
-    // })
-
-    // const value = await promise;
-    // return value;
-
-}
-
-export const initializeSettings = async () => {
-
-    const promise = new Promise((resolve, reject) => {
-        db.transaction(txn => {
-            txn.executeSql(
-                "insert into water_settings (name, value) values ('water_goal', ?)",
-                [2000.00],
-                (txn, res) => { },
-                (_, error) => reject("Error inserting water_settings table" + error)
-            );
-            txn.executeSql(
-                "insert into water_settings (name, value) values ('water_measurement', ?)",
-                ['mL'],
-                (txn, res) => { },
-                (_, error) => reject("Error inserting water_settings table" + error)
-            );
-        },
-            error => reject('error in transaction ' + error),
-            () => resolve())
+export const updateSettings = async (settingsId, settingsHash) => {
+    let settingsSQL = "UPDATE water_settings SET";
+    for (var settingName in settingsHash) {
+        if (['startTime', 'endTime'].includes(settingName)) {
+            settingsSQL =
+              settingsSQL +
+              " " +
+              settingName +
+              " = time('" +
+              settingsHash[settingName] +
+              "'),";
+        } else if (typeof settingsHash[settingName] === 'string') {
+            settingsSQL = 
+                settingsSQL +
+                " " +
+                settingName +
+                " = '" + settingsHash[settingName] +
+                "',";
+        } else {
+            settingsSQL =
+              settingsSQL +
+              " " +
+              settingName +
+              " = " +
+              settingsHash[settingName] +
+              ",";
+        }
+    }
+    settingsSQL = settingsSQL.substring(0, settingsSQL.length - 1) + " WHERE ID = " + settingsId;
+    console.log("seettings sql for updating: ", settingsSQL)
+    const noValue = new Promise((resolve, reject) => {
+        db.transaction((txn) => {
+        txn.executeSql(
+            settingsSQL,
+            [],
+            (txn, res) => {
+                resolve();
+            },
+            (_, error) => reject("Error: " + error)
+        );
     });
-    const value = await promise;
-    return value;
+  });
 
-}
-
+  const nothing = await noValue;
+  return nothing;
+};
 
 export const querySetting = async settingName => {
-
     const getValue = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
-                "SELECT * FROM water_settings where name = ?",
-                [settingName],
-                (txn, res) => {
-                    resolve(res.rows._array[0].value)
-                },
-                (_, error) => reject("Error: " + error)
+              "SELECT * FROM water_settings LIMIT 1",
+              [],
+              (txn, res) => {
+                console.log(
+                  "returning: ",
+                  settingName,
+                  res.rows._array[0][settingName]
+                );
+                resolve(res.rows._array[0][settingName]);
+              },
+              (_, error) => reject("Error: " + error)
             );
         });
     })
+
     const value = await getValue
     return value;
-
 }
 
 export const queryAllSettings = async () => {
-    db.transaction(txn => {
+    const getSettings = new Promise((resolve, reject) => {
+      db.transaction((txn) => {
         txn.executeSql(
-            "SELECT * FROM water_settings",
-            [],
-            (txn, res) => console.log("settings rows", res.rows, res.rowsAffected),
-            (_, error) => console.log("Error: ", error)
+          "SELECT * FROM water_settings LIMIT 1",
+          [],
+          (txn, res) => {
+            resolve(res.rows._array[0]);
+          },
+          (_, error) => reject("Error: " + error)
         );
+      });
     });
+
+    const settingsObject = await getSettings;
+    return settingsObject;
 }
 
 export const queryEntries = async startDay => {
@@ -143,7 +145,6 @@ export const addToDailyDrinkTotal = async (num, type) => {
 
     const value = await promise;
     return value;
-
 }
 
 export const dropAndCreateTables = async () => {
@@ -175,22 +176,100 @@ export const dropAndCreateTables = async () => {
                 (_, error) => reject("Error creating water_entries table" + error)
             );
             txn.executeSql(
-                `create table if not exists water_settings (
+              `create table if not exists water_settings (
                     id INTEGER PRIMARY KEY NOT NULL,
-                    name VARCHAR(30),
-                    value VARCHAR(30)
+                    goal VARCHAR(30), 
+                    measurement VARCHAR(30),
+                    frequency VARCHAR(30), 
+                    sunday INTEGER(1), 
+                    monday INTEGER(1), 
+                    tuesday INTEGER(1), 
+                    wednesday INTEGER(1),
+                    thursday INTEGER(1), 
+                    friday INTEGER(1), 
+                    saturday INTEGER(1), 
+                    startTime TIME, 
+                    endTime TIME
                 );`,
-                [],
-                (txn, res) => {
-                    console.log('tables created')
-                    resolve()
-                },
-                (_, error) => reject("Error creating water_settings table " + error)
+              [],
+              (txn, res) => {
+                console.log("tables created");
+                resolve();
+              },
+              (_, error) =>
+                reject("Error creating water_settings table " + error)
             );
         });
     })
 
     const value = await promise;
     return value;
-
 }
+
+export const initializeSettings = async () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction(
+      (txn) => {
+        let settingsId = 0;
+        txn.executeSql(
+          "SELECT * FROM water_settings LIMIT 1",
+          [],
+          (txn, res) => {
+            if (res.rows._array.length === 0) {
+              txn.executeSql(
+                `insert into water_settings ( 
+                            goal, measurement, frequency, 
+                            sunday, monday, tuesday, wednesday, thursday, friday, saturday, 
+                            startTime, endTime 
+                        ) values (
+                            2000.0, 'ml', 'auto', 
+                            1, 1, 1, 1, 1, 1, 1, 
+                            time('08:00:00'), time('22:00:00')
+                        )`,
+                [],
+                (txn, res) => resolve(res.insertId),
+                (_, error) =>
+                  reject("Error inserting water_settings table" + error)
+              );
+            } else {
+                resolve(res.rows._array[0].id)
+            }
+          },
+          (_, error) => reject("Error: " + error)
+        );
+      },
+      (error) => reject("error in transaction " + error),
+      () => resolve()
+    );
+  });
+
+  const settingsId = await promise;
+  return settingsId;
+};
+
+export const addFakeData = async () => {
+  // const promise = new Promise((resolve, reject) => {
+  //     db.transaction(txn => {
+  //         // add fake data
+  //         // drank today
+  //         // a week ago
+  //         // txn.executeSql(
+  //         //     "insert into water_entries (drinkable, amount, created_at) values ('week old water', ?, datetime('now', 'localtime','-7 days','start of day','weekday 2'))",
+  //         //                 [Math.floor(Math.random() * 100)],
+  //         //     (txn, res) => { },
+  //         //     (_, error) => console.log("Error inserting week water_entries table", error)
+  //         // );
+  //         // a month ago
+  //         // txn.executeSql(
+  //         //     "insert into water_entries (drinkable, amount, created_at) values ('month old water', ?, datetime('now','localtime','start of month','+1 day'))",
+  //         //     [Math.floor(Math.random() * 100)],
+  //         //     (txn, res) => { },
+  //         //     (_, error) => console.log("Error inserting month water_entries table", error)
+  //         // );
+  //     },
+  //         error => reject("transaction error")
+  //     )
+  // })
+  // const value = await promise;
+  // return value;
+};
