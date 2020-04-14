@@ -170,6 +170,12 @@ export const dropAndCreateTables = async () => {
                 (txn, res) => { console.log('tables dropped'); },
                 (_, error) => reject("Error dropping water_settings table" + error)
             );
+            txn.executeSql(
+              "DROP TABLE IF EXISTS water_types",
+              [],
+              (txn, res) => { console.log('tables dropped'); },
+              (_, error) => reject("Error dropping water_types table" + error)
+          );
 
             txn.executeSql(
                 `create table if not exists water_entries (
@@ -206,6 +212,19 @@ export const dropAndCreateTables = async () => {
               (_, error) =>
                 reject("Error creating water_settings table " + error)
             );
+
+            txn.executeSql(
+              `create table if not exists water_types (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  name VARCHAR(30),
+                  drinkable VARCHAR(30),
+                  amount INTEGER
+              );`,
+              [],
+              (txn, res) => { },
+              (_, error) => reject("Error creating water_types table" + error)
+          );
+
         });
     })
 
