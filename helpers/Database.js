@@ -129,8 +129,7 @@ export const queryEntries = async startDay => {
 }
 
 export const addToDailyDrinkTotal = async (num, type) => {
-
-     const promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(
                 "insert into water_entries (amount, drinkable, created_at) values (?, ?, datetime('now','localtime','-3 hours'))",
@@ -155,7 +154,6 @@ export const addToDailyDrinkTotal = async (num, type) => {
 }
 
 export const dropAndCreateTables = async () => {
-
     const promise = new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql(

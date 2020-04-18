@@ -7,7 +7,9 @@ import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
 import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
-export default function HomeScreen({navigation,route}) {
+import * as Reminders from '../helpers/Reminders';
+
+export default function HomeScreen() {
 
   const [amount, setAmount] = React.useState(0)
   const [sum, setSum] = React.useState(0)
@@ -25,6 +27,11 @@ export default function HomeScreen({navigation,route}) {
     const sum = await addToDailyDrinkTotal(num, type)
     setAmount(sum / goal.toFixed(1));
     setSum(sum)
+
+    if ((sum / goal) > 1) {
+      await Reminders.deleteAllQueuedReminders();
+      console.log("Too much water")
+    }
   }
 
   const color = (amount > 1) ? 'rgb(0, 150, 136)' : 'rgb(134, 65, 244)';
