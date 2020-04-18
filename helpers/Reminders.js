@@ -2,6 +2,8 @@ import { Notifications } from "expo";
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
 
+import * as Database from "./Database";
+
 const reminders = [
   "Be a superstar, drink water now",
   "Drink some damn water",
@@ -84,7 +86,8 @@ export const deleteAllQueuedReminders = async () => {
 export const queueHourlyReminders = async (daysDelayed) => {
   const anHour = 1000 * 60 * 60;
   const rightNow = new Date();
-  const hoursBeforeBedtime = 22 - rightNow.getHours();
+  const bedTime = parseInt((await Database.querySetting("endTime")).substring(0,2))
+  const hoursBeforeBedtime = bedTime - rightNow.getHours();
   
   for (let i = 1; i <= hoursBeforeBedtime; i++) {
     let reminderTime = rightNow.getTime() + (anHour * i);

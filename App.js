@@ -55,7 +55,7 @@ const handleReminder = notification => {
 
         await Database.dropAndCreateTables();
         let settingsId = await Database.initializeSettings();
-        await Database.addFakeData();
+        // await Database.addFakeData();
         // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
 
         setPushNotificationToken(await Reminders.registerForPushNotificationsAsync());
