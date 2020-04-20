@@ -10,45 +10,20 @@ const reminders = [
   "What's wrong with you, drink water",
   "Think you're too good for water?!?",
   "Only losers don't drink water",
+  "Coffee doesn't count, chug a water",
+  "Drink a water for every 2 coffees you've had",
+  "Dismiss this message if you're a bitch",
+  "Do not dismiss before drinking water",
+  "Hurry up, just drink a water",
+  "You might as well drink a glass a water",
+  "Drink a quick glass of water or fuck off"
 ];
 
-export const registerForPushNotificationsAsync = async () => {
-  if (Constants.isDevice) {
-    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-    let finalStatus = existingStatus;
-
-    if (existingStatus !== 'granted') {
-      console.log("existingstatus not granted: ", existingStatus)
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      console.log("finalstatus not granted: ", finalStatus)
-      console.log('Failed to get push token for push notification!');
-      return;
-    }
-    token = await Notifications.getExpoPushTokenAsync();
-    console.log("notification token **: ", token);
-    return token;
-  } else {
-    console.log('Must use physical device for Push Notifications');
-  }
-
-  if (Platform.OS === 'android') {
-    Notifications.createChannelAndroidAsync('default', {
-      name: 'default',
-      sound: true,
-      priority: 'max',
-      vibrate: [0, 250, 250, 250],
-    });
-  }
-};
-
-export const reminderListener = (handleReminder) => {
+export const addReminderListener = (handleReminder) => {
   return Notifications.addListener(handleReminder);
 }
 
-export const queueReminder = async (reminderTime) => {
+export const queueReminder = async (reminderTime, repeatFreq = '') => {
   const localNotification = {
     title: "Gotta Drink, Bitch",
     body: reminders[Math.floor(Math.random() * reminders.length)],
@@ -67,10 +42,13 @@ export const queueReminder = async (reminderTime) => {
   };
 
   const schedulingOptions = {
-    time: reminderTime,
-    // repeat: 'minute'
+    time: reminderTime
   };
 
+  if (repeatFreq) {
+    schedulingOptions['repeat'] = repeatFreq;
+  }
+  
   let reminderId = await Notifications.scheduleLocalNotificationAsync(
     localNotification,
     schedulingOptions
@@ -83,15 +61,37 @@ export const deleteAllQueuedReminders = async () => {
   console.log("Cancelled all reminders")
 }
 
-export const queueHourlyReminders = async (daysDelayed) => {
-  const anHour = 1000 * 60 * 60;
+// howOften = 1 for every hour, = 3 for every 3h
+export const queueNonRecurringTodayReminders = async (howOften) => {
+  const anHour = 1000 * 60 * 60 * howOften;
   const rightNow = new Date();
-  const bedTime = parseInt((await Database.querySetting("endTime")).substring(0,2))
-  const hoursBeforeBedtime = bedTime - rightNow.getHours();
-  
-  for (let i = 1; i <= hoursBeforeBedtime; i++) {
-    let reminderTime = rightNow.getTime() + (anHour * i);
+  const startTime = rightNow.getHours();
+  const endTime = parseInt((await Database.querySetting("endTime")).substring(0,2))
+  const occurrences = (endTime - startTime) / howOften; 
+
+  for (let i = 0; i < occurrences; i++) {
+    // has to be in the future, so add 3 seconds
+    let reminderTime = (rightNow.getTime() + 3000) + (anHour * i);
     await queueReminder(reminderTime);
   }
-  console.log(`Queued ${hoursBeforeBedtime} new reminders`)
+  console.log(`Queued ${occurrences} reminders for today`);
+};
+
+// howOften = 1 for every hour, = 3 for every 3h
+export const queueRecurringTomorrowReminders = async (howOften) => {
+  const anHour = 1000 * 60 * 60 * howOften;
+  const settings = await Database.queryAllSettings();
+  const startTime = parseInt(settings.startTime.substring(0, 2));
+  const endTime = parseInt(settings.endTime.substring(0, 2));
+  const occurrences = (endTime - startTime) / howOften; 
+  
+  const tomorrow = new Date ()
+  tomorrow.setDate(new Date().getDate() + 1);
+  tomorrow.setHours(startTime, 0, 0, 0);
+    
+  for (let i = 0; i < occurrences; i++) {
+    let reminderTime = tomorrow.getTime() + anHour * i;
+    await queueReminder(reminderTime, "day");
+  }
+  console.log(`Queued ${occurrences} new reminders starting tomorrow`);
 };

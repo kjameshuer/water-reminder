@@ -165,7 +165,7 @@ export const dropAndCreateTables = async () => {
             txn.executeSql(
                 "DROP TABLE IF EXISTS water_settings",
                 [],
-                (txn, res) => { console.log('tables dropped'); },
+                (txn, res) => { },
                 (_, error) => reject("Error dropping water_settings table" + error)
             );
             txn.executeSql(

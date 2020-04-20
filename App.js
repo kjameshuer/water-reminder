@@ -17,24 +17,20 @@ const Stack = createStackNavigator();
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
-  const [pushNotificationToken, setPushNotificationToken] = React.useState('');
+  // const [pushNotificationToken, setPushNotificationToken] = React.useState('');
   // // ExponentPushToken[AGpAbsEP-jLF6l5HPMIYN_]
-  const [reminder, setReminder] = React.useState({});
-  const [reminderSubscription, setReminderSubscription] = React.useState();
-
+  
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
  
-// Handle Notifications that are received or selected while the app
-// is open. If the app was closed and then opened by tapping the
-// notification (rather than just tapping the app icon to open it),
-// this function will fire on the next tick after the app starts
-// with the notification data.
-const handleReminder = notification => {
-  Vibration.vibrate();
-  console.log("notification fired ", notification);
-  setReminder(notification);
-};
+  // Handle Notifications that are received or selected while the app
+  // is open. If the app was closed and then opened by tapping the
+  // notification (rather than just tapping the app icon to open it),
+  // this function will fire on the next tick after the app starts
+  // with the notification data.
+  const handleReminder = notification => {
+    Vibration.vibrate();
+  };
   
 
   // Load any resources or data that we need prior to rendering the app
@@ -58,11 +54,11 @@ const handleReminder = notification => {
         // await Database.addFakeData();
         // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
 
-        setPushNotificationToken(await Reminders.registerForPushNotificationsAsync());
-        setReminderSubscription(Reminders.reminderListener(handleReminder));
-
+        Reminders.addReminderListener(handleReminder);
         await Reminders.deleteAllQueuedReminders();
-        let reminderId = await Reminders.queueHourlyReminders("");
+        // await Reminders.queueNonRecurringTodayReminders(1); // 1 = hourly, 3 = every 3h
+        // await Reminders.queueRecurringTomorrowReminders(1);
+        // await Reminders.queueReminder((new Date()).getTime() + 3000, "minute");
 
         // const weeklyEntries = await Database.queryAllSettings(); // 'day', 'week', 'month'
         // console.log("the settgings: ", weeklyEntries);

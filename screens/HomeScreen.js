@@ -30,7 +30,7 @@ export default function HomeScreen() {
 
     if ((sum / goal) > 1) {
       await Reminders.deleteAllQueuedReminders();
-      console.log("Too much water")
+      await Reminders.queueRecurringTomorrowReminders(1);
     }
   }
 
