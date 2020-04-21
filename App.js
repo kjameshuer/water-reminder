@@ -10,7 +10,7 @@ import * as Notifications from './helpers/Notifications';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import SettingsScreen from './screens/SettingsScreen'
 import useLinking from './navigation/useLinking';
-
+import { addToDailyDrinkTotal, querySetting } from './helpers/Database';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +21,9 @@ export default function App(props) {
   // // ExponentPushToken[AGpAbsEP-jLF6l5HPMIYN_]
   // const [notification, setNotification] = React.useState({});
   // const [notificationSubscription, setNotificationSubscription] = React.useState();
+
+
+
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
  
@@ -45,6 +48,7 @@ export default function App(props) {
 
         await Database.dropAndCreateTables();
         let settingsId = await Database.initializeSettings();
+
         // await Database.addFakeData();
         // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
        // setPushNotificationToken(await Notifications.registerForPushNotificationsAsync());
@@ -72,7 +76,7 @@ export default function App(props) {
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
+          <Stack.Navigator >
             <Stack.Screen name="Root" component={BottomTabNavigator} />
             <Stack.Screen name="Settings" component={SettingsScreen}  />
           </Stack.Navigator>
