@@ -10,16 +10,13 @@ import * as Reminders from './helpers/Reminders';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import SettingsScreen from './screens/SettingsScreen'
 import useLinking from './navigation/useLinking';
-import { addToDailyDrinkTotal, querySetting } from './helpers/Database';
 
 const Stack = createStackNavigator();
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
-  // const [pushNotificationToken, setPushNotificationToken] = React.useState('');
-  // // ExponentPushToken[AGpAbsEP-jLF6l5HPMIYN_]
-  
+   
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
  
@@ -53,16 +50,12 @@ export default function App(props) {
         let settingsId = await Database.initializeSettings();
 
         // await Database.addFakeData();
-        // await Database.updateSettings(settingsId, { goal: '10000.0', startTime: '09:00:00', measurement: 'kg', friday: 0 })
-
+        
         Reminders.addReminderListener(handleReminder);
         await Reminders.deleteAllQueuedReminders();
-        // await Reminders.queueNonRecurringTodayReminders(1); // 1 = hourly, 3 = every 3h
+        // await Reminders.queueNonRecurringTodayReminders(1);
         // await Reminders.queueRecurringTomorrowReminders(1);
-        // await Reminders.queueReminder((new Date()).getTime() + 3000, "minute");
 
-        // const weeklyEntries = await Database.queryAllSettings(); // 'day', 'week', 'month'
-        // console.log("the settgings: ", weeklyEntries);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
