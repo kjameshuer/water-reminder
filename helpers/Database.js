@@ -246,7 +246,7 @@ export const initializeSettings = async () => {
                             sunday, monday, tuesday, wednesday, thursday, friday, saturday, 
                             startTime, endTime 
                         ) values (
-                            '2000.0', 'ml', 'auto', 
+                            '1000.0', 'ml', 'auto', 
                             1, 1, 1, 1, 1, 1, 1, 
                             time('08:00:00'), time('22:00:00')
                         )`,

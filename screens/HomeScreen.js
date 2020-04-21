@@ -9,11 +9,14 @@ import ButtonGrid from '../components/ButtonGrid';
 import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
 import * as Reminders from '../helpers/Reminders';
 
-export default function HomeScreen() {
+export default function HomeScreen({navigation,route}) {
 
   const [amount, setAmount] = React.useState(0)
   const [sum, setSum] = React.useState(0)
   const [goal, setGoal] = React.useState(0)
+
+
+
 
   React.useEffect(() => {
     setAmount(0)
@@ -22,6 +25,24 @@ export default function HomeScreen() {
     }
     getGoal();
   }, [])
+
+  React.useEffect(() => {
+    const getGoal = async () => {
+      const theGoal = await querySetting('goal')
+      setGoal(theGoal);
+      const sum = await addToDailyDrinkTotal(0, 'glass')
+     
+      console.log("the Sum", sum)
+      console.log('amount', Math.floor(amount * 100))
+      setAmount(sum / theGoal.toFixed(1));
+      setSum(sum)
+    }
+    const unsubscribe = navigation.addListener('focus', () => {
+      getGoal();
+    });
+  
+    return unsubscribe;
+  }, [navigation, goal, sum]);
 
   const handleOnDrinkPress = async (num, type) => {
     const sum = await addToDailyDrinkTotal(num, type)

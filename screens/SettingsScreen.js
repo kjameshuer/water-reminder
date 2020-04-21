@@ -18,7 +18,6 @@ const SettingsScreen = () => {
 
             // await call to data base
             const fetchedSettings = await queryAllSettings();
-            console.log('fetched settings', fetchedSettings)
             setSettings(fetchedSettings)
         }
         asyncFunction()
@@ -26,7 +25,7 @@ const SettingsScreen = () => {
     }, [])
 
     useEffect(() => {
-        console.log("the settings", settings)
+ 
         clearTimeout(timeout)
         const asyncFunction = async () => {
             // await call to data base
