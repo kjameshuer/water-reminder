@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
-import { addToDailyDrinkTotal, querySetting } from '../helpers/Database';
+import { addToDailyDrinkTotal, querySetting, getDailyDrinkTotal } from '../helpers/Database';
 import * as Reminders from '../helpers/Reminders';
 
 export default function HomeScreen({navigation,route}) {
@@ -17,7 +17,12 @@ export default function HomeScreen({navigation,route}) {
   React.useEffect(() => {
     setAmount(0)
     const getGoal = async () => {
-      setGoal(await querySetting('goal'));
+
+      const theGoal = await querySetting('goal')
+      setGoal(theGoal);
+      const sum = await getDailyDrinkTotal()
+      setAmount(sum / theGoal.toFixed(1));
+      setSum(sum)
     }
     getGoal();
   }, [])
@@ -28,6 +33,7 @@ export default function HomeScreen({navigation,route}) {
       setGoal(theGoal);
       const sum = await addToDailyDrinkTotal(0, 'glass')
      
+      const sum = await getDailyDrinkTotal()
       setAmount(sum / theGoal.toFixed(1));
       setSum(sum)
     }

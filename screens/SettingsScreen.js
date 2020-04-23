@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState, useEffect } from 'react';
-import { Picker, StyleSheet, Text, View, Switch, TextInput } from 'react-native';
+import { Picker, StyleSheet, Text, View, Switch, TextInput, Button } from 'react-native';
 import { queryAllSettings, updateSettings } from '../helpers/Database';
 import * as Reminders from '../helpers/Reminders';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
@@ -13,8 +13,6 @@ const SettingsScreen = () => {
     const [timeout, updateTimeout] = useState(undefined)
 
     useEffect(() => {
-        //getSettings
-        //toggleUpdated(true)
         const asyncFunction = async () => {
             const fetchedSettings = await queryAllSettings();
             setSettings(fetchedSettings)
@@ -44,6 +42,7 @@ const SettingsScreen = () => {
         <>
             {settings.hasOwnProperty('goal') &&
                 <View style={styles.settingsScreen}>
+                    <Button title={'Save'} onPress={()=>updateSettings(settings.id, settings)} />
                     <Text>Daily Goal</Text>
                     <TextInput
                         style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}

@@ -49,7 +49,7 @@ export default function App(props) {
         await Database.createTables();
         let settingsId = await Database.initializeSettings();
 
-        // await Database.addFakeData();
+         //await Database.addFakeData();
         
         Reminders.addReminderListener(handleReminder);
         // await Reminders.deleteAllQueuedReminders();

@@ -1,26 +1,32 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, FlatList, View } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { addToDailyDrinkTotal } from '../helpers/Database';
 
 export default function InputScreen() {
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <View style={styles.container} contentContainerStyle={styles.contentContainer}>
       <FlatList
         data={DATA}
-        renderItem={({ item }) => <Item name={item.name} amount={item.amount.toString()} />}
-        keyExtractor={item => item.id}
+        renderItem={({ item }) => <Item name={item.name} amount={item.amount} type={item.type} />}
+        keyExtractor={item => `${item.id}`}
       />
-    </ScrollView>
+    </View>
   );
 }
+const handleOnDrinkPress = async (num, type) => {
+  await addToDailyDrinkTotal(num, type)
 
-const Item = ({ name, amount }) => {
+}
+const Item = ({ name, amount, type }) => {
+  console.log("typeof", typeof(name), typeof(amount), typeof(type))
   return (
-    <TouchableOpacity key={name} style={styles.item}>
+    <TouchableOpacity onPress={() => handleOnDrinkPress(amount, type)} style={styles.item}>
       <Text>{name}</Text>
-      <Text>{amount}</Text>
+      <Text>{`${amount}`}</Text>
     </TouchableOpacity>
   )
 }
@@ -29,12 +35,14 @@ const DATA = [
   {
     id: 11313514643,
     amount: 250,
-    name: 'Small Coffee'
+    name: 'Small Coffee',
+    type: 'coffee'
   },
   {
     id: 2148545851351,
     amount: 540,
-    name: 'Large Coffee'
+    name: 'Large Coffee',
+    type: 'coffee'
   }
 ]
 
@@ -44,7 +52,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
     width: '100%'
   },
-  contentContainer:{
+  contentContainer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
