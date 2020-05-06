@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "HelloWorld",
+    "name": "Gotta Drink, Bitch",
     "slug": "water-reminder",
     "platforms": [
       "ios",
@@ -23,7 +23,13 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.kjhuer.waterReminder",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.kjhuer.waterReminder",
+      "versionCode": 1
     }
   }
 }
