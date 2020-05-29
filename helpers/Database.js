@@ -119,20 +119,55 @@ export const queryEntries = async startDay => {
         startDaySql,
         [],
         (txn, res) => {
-          let amountOfDaysInMonth;
-          let finalEntries;
+          let entryCount;
+          let finalEntries = [];
+
           if (startDay === 'month') {
             const d = new Date();
             const m = d.getMonth();
             const y = d.getFullYear()
             console.log("THE MONTH", m)
-            amountOfDaysInMonth = new Date(y, m+1, 0).getDate();        
+            entryCount = new Date(y, m + 1, 0).getDate();
+            finalEntries = padEntries(res, entryCount, true);
           }
-          if (startDay === 'day'){
+          if (startDay === 'day') {
+            entryCount = 24
+            finalEntries = padEntries(res, entryCount)
             
+            // let arrayCtr = 0;
+            // const start = parseInt(res.rows._array[0].measure);
+            // const end = parseInt(res.rows._array[res.rows._array.length-1].measure);
+            // for (let x = start; x <= end; x++) {
+            //   console.log('this thing',res.rows._array[arrayCtr])
+            //   if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
+            //       finalEntries.push(res.rows._array[arrayCtr])
+            //       arrayCtr++;
+            //   }else{
+            //     finalEntries.push({data: 0, measure: x})
+            //   }
+            // }
           }
-          
-          resolve({entries: res.rows._array, dayCount: amountOfDaysInMonth})
+
+          if (startDay === 'week'){
+            entryCount = 7
+            finalEntries = padEntries(res, entryCount)
+            
+          //   let arrayCtr = 0;
+          //   const start = 0;
+          //   const end = 6;
+          //   for (let x = start; x <= end; x++) {
+          //     console.log('this thing',res.rows._array[arrayCtr])
+          //     if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
+          //         finalEntries.push(res.rows._array[arrayCtr])
+          //         arrayCtr++;
+          //     }else{
+          //       finalEntries.push({data: 0, measure: x})
+          //     }
+          //   }
+          // }
+
+          console.log('finalEntries', finalEntries)
+          resolve({ entries: finalEntries, entryCount: entryCount })
         },
         (_, error) => console.log("Entry query error: ", error)
       );
@@ -141,6 +176,23 @@ export const queryEntries = async startDay => {
 
   const value = await promise;
   return value;
+}
+
+const padEntries = (dbEntries, totalEntries, startAtOne = false) => {
+  let entries = dbEntries.rows._array;
+  let currentNum = startAtOne ? 1 : 0;
+  let maxNum = startAtOne ? totalEntries + 1 : totalEntries;
+  let paddedEntries = [];
+  let currentEntryNum = 0;
+
+  for(currentNum; currentNum < maxNum; currentNum++) {
+    let entry = {data: currentNum, measure: 0};
+    if (currentEntryNum < entries.length && entries[currentEntryNum].data == currentNum) {
+      entry = entries[currentEntryNum]
+      currentEntryNum++;
+    }
+    paddedEntries.push(entry);
+  }
 }
 
 export const addToDailyDrinkTotal = async (num, type) => {
@@ -209,7 +261,7 @@ export const createTables = async () => {
     );`,
         [],
         (txn, res) => {
-          
+
 
         },
         (_, error) =>
@@ -217,7 +269,7 @@ export const createTables = async () => {
       );
 
       txn.executeSql(
-              `create table if not exists water_types (
+        `create table if not exists water_types (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             name VARCHAR(30),
             drinkable VARCHAR(30),

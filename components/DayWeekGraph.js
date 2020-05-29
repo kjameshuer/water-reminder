@@ -18,7 +18,7 @@ const DayWeekGraph = ({ data, measures }) => {
                         numberOfTicks={10}
                         formatLabel={(value) => `${value}`}
                     />
-                    <View style={{ width: '85%' }}>
+                    <View style={{ width: '85%', marginHorizontal:5 }}>
                         <BarChart
                             style={{ flex: 1 }}
                             data={data}
@@ -34,7 +34,7 @@ const DayWeekGraph = ({ data, measures }) => {
             }
             {measures &&
                 <XAxis
-                    style={{ marginHorizontal: '8%', width: '85%' }}
+                    style={{ marginHorizontal: '10%', width: '80%' }}
                     data={measures}
                     xAccessor={({ item }) => item}
                     contentInset={{ left: 10, right: 10 }}
