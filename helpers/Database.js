@@ -133,7 +133,7 @@ export const queryEntries = async startDay => {
           if (startDay === 'day') {
             entryCount = 24
             finalEntries = padEntries(res, entryCount)
-            
+
             // let arrayCtr = 0;
             // const start = parseInt(res.rows._array[0].measure);
             // const end = parseInt(res.rows._array[res.rows._array.length-1].measure);
@@ -148,24 +148,24 @@ export const queryEntries = async startDay => {
             // }
           }
 
-          if (startDay === 'week'){
+          if (startDay === 'week') {
             entryCount = 7
             finalEntries = padEntries(res, entryCount)
-            
-          //   let arrayCtr = 0;
-          //   const start = 0;
-          //   const end = 6;
-          //   for (let x = start; x <= end; x++) {
-          //     console.log('this thing',res.rows._array[arrayCtr])
-          //     if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
-          //         finalEntries.push(res.rows._array[arrayCtr])
-          //         arrayCtr++;
-          //     }else{
-          //       finalEntries.push({data: 0, measure: x})
-          //     }
-          //   }
-          // }
 
+            //   let arrayCtr = 0;
+            //   const start = 0;
+            //   const end = 6;
+            //   for (let x = start; x <= end; x++) {
+            //     console.log('this thing',res.rows._array[arrayCtr])
+            //     if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
+            //         finalEntries.push(res.rows._array[arrayCtr])
+            //         arrayCtr++;
+            //     }else{
+            //       finalEntries.push({data: 0, measure: x})
+            //     }
+            //   }
+            // }
+          }
           console.log('finalEntries', finalEntries)
           resolve({ entries: finalEntries, entryCount: entryCount })
         },
@@ -185,8 +185,8 @@ const padEntries = (dbEntries, totalEntries, startAtOne = false) => {
   let paddedEntries = [];
   let currentEntryNum = 0;
 
-  for(currentNum; currentNum < maxNum; currentNum++) {
-    let entry = {data: currentNum, measure: 0};
+  for (currentNum; currentNum < maxNum; currentNum++) {
+    let entry = { data: currentNum, measure: 0 };
     if (currentEntryNum < entries.length && entries[currentEntryNum].data == currentNum) {
       entry = entries[currentEntryNum]
       currentEntryNum++;
@@ -221,7 +221,25 @@ export const getDailyDrinkTotal = async () => {
         (_, error) => reject(error)
       )
     },
-      (_, error) => reject("Error inserting water_entries table" + error)
+      (_, error) => reject("Error querying dailydrinktotal" + error)
+    )
+  })
+
+  const response = await promise;
+  return response;
+}
+
+export const getDrinkTypeTotalsToday = async () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction(txn => {
+      txn.executeSql(
+        "SELECT count(*) as count, drinkable FROM water_entries where created_at > date('now','localtime','start of day') group by drinkable",
+        [],
+        (txn, res) => resolve(res.rows._array),
+        (_, error) => reject(error)
+      )
+    },
+      (_, error) => reject("Error querying drinktypestoday" + error)
     )
   })
 

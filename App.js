@@ -16,10 +16,10 @@ const Stack = createStackNavigator();
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
-   
+
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
- 
+
   // Handle Notifications that are received or selected while the app
   // is open. If the app was closed and then opened by tapping the
   // notification (rather than just tapping the app icon to open it),
@@ -28,11 +28,11 @@ export default function App(props) {
   const handleReminder = notification => {
     Vibration.vibrate();
   };
-  
+
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
-  
+
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide();
@@ -47,15 +47,14 @@ export default function App(props) {
         });
 
         await Database.createTables();
-        let settingsId = await Database.initializeSettings();
+        await Database.initializeSettings();
 
-         //await Database.addFakeData();
-        
+        //await Database.addFakeData();
+
         Reminders.addReminderListener(handleReminder);
         // await Reminders.deleteAllQueuedReminders();
         // await Reminders.queueNonRecurringTodayReminders(1);
         // await Reminders.queueRecurringTomorrowReminders(1);
-
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
@@ -77,7 +76,7 @@ export default function App(props) {
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
           <Stack.Navigator >
             <Stack.Screen name="Root" component={BottomTabNavigator} />
-            <Stack.Screen name="Settings" component={SettingsScreen}  />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>

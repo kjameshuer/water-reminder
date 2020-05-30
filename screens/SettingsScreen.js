@@ -42,7 +42,7 @@ const SettingsScreen = () => {
         <>
             {settings.hasOwnProperty('goal') &&
                 <View style={styles.settingsScreen}>
-                    <Button title={'Save'} onPress={()=>updateSettings(settings.id, settings)} />
+                    <Button title={'Save'} onPress={() => updateSettings(settings.id, settings)} />
                     <Text>Daily Goal</Text>
                     <TextInput
                         style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
@@ -73,17 +73,18 @@ const SettingsScreen = () => {
                             setSettings({ ...settings, frequency: itemValue })
                         }}
                     >
-                        <Picker.Item label="Never" value="never" />
+                        <Picker.Item label="Never" value="0h" />
                         <Picker.Item label="Hourly" value="1h" />
+                        <Picker.Item label="Every 2 hours" value="2h" />
                         <Picker.Item label="Every 3 hours" value="3h" />
                     </Picker>
-                    
+
                     <Text>Remind me on Mondays</Text>
                     <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
                         thumbColor={!!settings.monday ? "#f5dd4b" : "#f4f3f4"}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={ e => {
+                        onValueChange={e => {
                             setSettings({ ...settings, monday: e ? 1 : 0 })
                         }}
                         value={!!settings.monday}
