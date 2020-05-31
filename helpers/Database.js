@@ -56,11 +56,7 @@ export const querySetting = async settingName => {
         "SELECT * FROM water_settings LIMIT 1",
         [],
         (txn, res) => {
-          console.log(
-            "returning: ",
-            settingName,
-            res.rows._array[0][settingName]
-          );
+          // console.log("returning: ", settingName, res.rows._array[0][settingName]);
           resolve(res.rows._array[0][settingName]);
         },
         (_, error) => reject("Error: " + error)
@@ -91,19 +87,19 @@ export const queryAllSettings = async () => {
 }
 
 export const queryEntries = async startDay => {
-  let startDaySql = "" //SELECT strftime('%Y-%m-%d', created_at) as day, sum(amount) as sum 
-  switch (startDay) { //  where created_at > datetime('now','localtime','weekday 0','-14 days','start of day') 
-    case "week":
-      startDaySql = `SELECT strftime('%Y-%m-%d', created_at) as date, strftime('%d', created_at) as measure, sum(amount) as amount 
-              FROM water_entries
-              where created_at between datetime('now','localtime','weekday 0','-7 days','start of day') and datetime('now','localtime','weekday 0','start of day') 
-              group by strftime('%Y-%m-%d', created_at)`
-      break;
+  let startDaySql = "" 
+  switch (startDay) { 
     case "month":
       startDaySql = `SELECT strftime('%Y-%m-%d', created_at) as date, strftime('%d', created_at) as day, sum(amount) as sum 
               FROM water_entries
               where datetime('now','localtime','start of month')
               group by strftime('%Y-%m-%dT%H:00:00.000', created_at)`
+      break;
+    case "week":
+      startDaySql = `SELECT strftime('%Y-%m-%d', created_at) as date, strftime('%d', created_at) as measure, sum(amount) as amount 
+              FROM water_entries
+              where created_at between datetime('now','localtime','weekday 0','-7 days','start of day') and datetime('now','localtime','weekday 0','start of day') 
+              group by strftime('%Y-%m-%d', created_at)`
       break;
     default:
       // day
@@ -112,7 +108,7 @@ export const queryEntries = async startDay => {
               where created_at > datetime('now','localtime','start of day') 
               group by strftime('%H', created_at)`
   }
-  // console.log("the entries query: ", startDaySql)
+  
   const promise = new Promise((resolve, reject) => {
     db.transaction(txn => {
       txn.executeSql(
@@ -121,52 +117,26 @@ export const queryEntries = async startDay => {
         (txn, res) => {
           let entryCount;
           let finalEntries = [];
+          
+          switch (startDay) { 
+            case "month":
+              const d = new Date();
+              const m = d.getMonth();
+              const y = d.getFullYear()
 
-          if (startDay === 'month') {
-            const d = new Date();
-            const m = d.getMonth();
-            const y = d.getFullYear()
-            console.log("THE MONTH", m)
-            entryCount = new Date(y, m + 1, 0).getDate();
-            finalEntries = padEntries(res, entryCount, true);
+              entryCount = new Date(y, m + 1, 0).getDate();
+              finalEntries = padEntries(res, entryCount, true);
+              break;
+            case "week":
+              entryCount = 7;
+              finalEntries = padEntries(res, entryCount);
+              break;
+            default:
+              //day
+              entryCount = 24;
+              finalEntries = padEntries(res, entryCount);
           }
-          if (startDay === 'day') {
-            entryCount = 24
-            finalEntries = padEntries(res, entryCount)
-
-            // let arrayCtr = 0;
-            // const start = parseInt(res.rows._array[0].measure);
-            // const end = parseInt(res.rows._array[res.rows._array.length-1].measure);
-            // for (let x = start; x <= end; x++) {
-            //   console.log('this thing',res.rows._array[arrayCtr])
-            //   if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
-            //       finalEntries.push(res.rows._array[arrayCtr])
-            //       arrayCtr++;
-            //   }else{
-            //     finalEntries.push({data: 0, measure: x})
-            //   }
-            // }
-          }
-
-          if (startDay === 'week') {
-            entryCount = 7
-            finalEntries = padEntries(res, entryCount)
-
-            //   let arrayCtr = 0;
-            //   const start = 0;
-            //   const end = 6;
-            //   for (let x = start; x <= end; x++) {
-            //     console.log('this thing',res.rows._array[arrayCtr])
-            //     if (res.rows._array[arrayCtr] && res.rows._array[arrayCtr].measure == x){
-            //         finalEntries.push(res.rows._array[arrayCtr])
-            //         arrayCtr++;
-            //     }else{
-            //       finalEntries.push({data: 0, measure: x})
-            //     }
-            //   }
-            // }
-          }
-          console.log('finalEntries', finalEntries)
+          
           resolve({ entries: finalEntries, entryCount: entryCount })
         },
         (_, error) => console.log("Entry query error: ", error)
@@ -186,22 +156,23 @@ const padEntries = (dbEntries, totalEntries, startAtOne = false) => {
   let currentEntryNum = 0;
 
   for (currentNum; currentNum < maxNum; currentNum++) {
-    let entry = { data: currentNum, measure: 0 };
-    if (currentEntryNum < entries.length && entries[currentEntryNum].data == currentNum) {
+    let entry = { measure: currentNum, amount: 0 };
+    if (currentEntryNum < entries.length && entries[currentEntryNum].measure == currentNum) {
       entry = entries[currentEntryNum]
       currentEntryNum++;
     }
     paddedEntries.push(entry);
   }
+  return paddedEntries;
 }
 
-export const addToDailyDrinkTotal = async (num, type) => {
+export const addToDrinkTotalToday = async (num, type) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(txn => {
       txn.executeSql(
-        "insert into water_entries (amount, drinkable, created_at) values (?, ?, datetime('now','localtime','-3 hours'))",
+        "insert into water_entries (amount, drinkable, created_at) values (?, ?, datetime('now','localtime'))",
         [num, type],
-        (txn, res) => resolve(getDailyDrinkTotal()),
+        (txn, res) => resolve(getDrinkTotalToday()),
         (_, error) => reject("Error inserting water_entries table" + error)
       );
     });
@@ -211,7 +182,7 @@ export const addToDailyDrinkTotal = async (num, type) => {
   return dailySum;
 }
 
-export const getDailyDrinkTotal = async () => {
+export const getDrinkTotalToday = async () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(txn => {
       txn.executeSql(
@@ -294,7 +265,7 @@ export const createTables = async () => {
             amount INTEGER
         );`,
         [],
-        (txn, res) => { console.log("tables created sda "); resolve() },
+        (txn, res) => { console.log("tables created"); resolve() },
         (_, error) => reject("Error creating water_types table" + error)
       );
     });
@@ -326,64 +297,6 @@ export const dropAndCreateTables = async () => {
         (_, error) => reject("Error dropping water_types table" + error)
       );
 
-      txn.executeSql(
-        `create table if not exists water_entries (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    drinkable VARCHAR(30),
-                    amount INTEGER,
-                    created_at DATETIME default (datetime('now','localtime'))
-                );`,
-        [],
-        (txn, res) => { },
-        (_, error) => reject("Error creating water_entries table" + error)
-      );
-      txn.executeSql(
-        `create table if not exists water_settings (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    goal INTEGER, 
-                    measurement VARCHAR(30),
-                    frequency VARCHAR(30), 
-                    sunday INTEGER(1), 
-                    monday INTEGER(1), 
-                    tuesday INTEGER(1), 
-                    wednesday INTEGER(1),
-                    thursday INTEGER(1), 
-                    friday INTEGER(1), 
-                    saturday INTEGER(1), 
-                    startTime TIME, 
-                    endTime TIME
-                );`,
-        [],
-        (txn, res) => {
-          console.log("tables created");
-          resolve();
-        },
-        (_, error) =>
-          reject("Error creating water_settings table " + error)
-      );
-
-      txn.executeSql(
-        `create table if not exists water_types (
-                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                  name VARCHAR(30),
-                  drinkable VARCHAR(30),
-                  amount INTEGER
-              );`,
-        [],
-        (txn, res) => { },
-        (_, error) => reject("Error creating water_types table" + error)
-      );
-
-    });
-  })
-
-  const value = await promise;
-  return value;
-}
-
-export const createTables = async () => {
-  const promise = new Promise((resolve, reject) => {
-    db.transaction(txn => {
       txn.executeSql(
         `create table if not exists water_entries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

@@ -48,13 +48,8 @@ export default function App(props) {
 
         await Database.createTables();
         await Database.initializeSettings();
-
-        //await Database.addFakeData();
-
         Reminders.addReminderListener(handleReminder);
-        // await Reminders.deleteAllQueuedReminders();
-        // await Reminders.queueNonRecurringTodayReminders(1);
-        // await Reminders.queueRecurringTomorrowReminders(1);
+
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);

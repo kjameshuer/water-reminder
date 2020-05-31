@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, Picker, Button } from 'react-native';
 import { BarChart, XAxis, YAxis, Grid } from 'react-native-svg-charts'
 
 const DayWeekGraph = ({ data, measures }) => {
-    console.log("the daata measures", data, typeof measures[0])
     return (
         <View style={{ padding: 20 }}>
             {data &&

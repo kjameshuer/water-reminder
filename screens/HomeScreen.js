@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
 import items from '../constants/LiquidAmounts'
 import ButtonGrid from '../components/ButtonGrid';
-import { addToDailyDrinkTotal, querySetting, getDailyDrinkTotal, getDrinkTypeTotalsToday } from '../helpers/Database';
+import { addToDrinkTotalToday, querySetting, getDrinkTotalToday, getDrinkTypeTotalsToday } from '../helpers/Database';
 import * as Reminders from '../helpers/Reminders';
 
 export default function HomeScreen({ navigation, route }) {
@@ -18,12 +18,12 @@ export default function HomeScreen({ navigation, route }) {
   const [glass, setGlass] = React.useState(0)
 
   React.useEffect(() => {
-    setAmount(0)
-    const getGoal = async () => {
+    setAmount(0);
 
+    const getGoal = async () => {
       const theGoal = await querySetting('goal')
       setGoal(theGoal);
-      const sum = await getDailyDrinkTotal()
+      const sum = await getDrinkTotalToday()
       setAmount(sum / theGoal.toFixed(1));
       setSum(sum)
       const drinkTotals = await getDrinkTypeTotalsToday();
@@ -40,11 +40,10 @@ export default function HomeScreen({ navigation, route }) {
     const getGoal = async () => {
       const theGoal = await querySetting('goal')
       setGoal(theGoal);
-      const sum = await addToDailyDrinkTotal(0, 'glass')
-     
-      const sum = await getDailyDrinkTotal()
+      
+      const sum = await getDrinkTotalToday();
       setAmount(sum / theGoal.toFixed(1));
-      setSum(sum)
+      setSum(sum);
 
       const drinkTotals = await getDrinkTypeTotalsToday();
       drinkTotals.forEach(drinkType => {
@@ -62,7 +61,7 @@ export default function HomeScreen({ navigation, route }) {
   }, [navigation, goal, sum]);
 
   const handleOnDrinkPress = async (num, type) => {
-    const sum = await addToDailyDrinkTotal(num, type)
+    const sum = await addToDrinkTotalToday(num, type)
     setAmount(sum / goal.toFixed(1));
     setSum(sum)
 

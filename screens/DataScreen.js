@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, Picker, Button } from 'react-native';
 import { BarChart, XAxis, Grid } from 'react-native-svg-charts'
 import { ScrollView } from 'react-native-gesture-handler';
 import windowObject from '../constants/Layout';
-import { addToDailyDrinkTotal, queryEntries } from '../helpers/Database';
+import { addToDrinkTotalToday, queryEntries } from '../helpers/Database';
 import DayWeekGraph from '../components/DayWeekGraph';
 
 
@@ -18,6 +18,7 @@ export default function DataScreen({ navigation, route }) {
     React.useEffect(() => {
         const getEntries = async () => {
             const { entries, dayCount } = await queryEntries(timePeriod)
+            
             setData(entries.map(ent => ent.amount))
             setMeasures(entries.map(ent => ent.measure))
             setDayCount(dayCount);

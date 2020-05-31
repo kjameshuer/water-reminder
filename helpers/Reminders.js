@@ -68,6 +68,10 @@ export const deleteAllQueuedReminders = async () => {
 
 // howOften = 1 for every hour, = 3 for every 3h
 export const queueNonRecurringTodayReminders = async (howOften) => {
+  if (howOften == 0) {
+    console.log(`Queued 0 new reminders for today`);
+    return;
+  }
   const anHour = 1000 * 60 * 60 * howOften;
   const rightNow = new Date();
   const startTime = rightNow.getHours();
@@ -84,6 +88,10 @@ export const queueNonRecurringTodayReminders = async (howOften) => {
 
 // howOften = 1 for every hour, = 3 for every 3h
 export const queueRecurringTomorrowReminders = async (howOften) => {
+  if (howOften == 0) {
+    console.log(`Queued 0 new reminders starting tomorrow`);
+    return;
+  }
   const anHour = 1000 * 60 * 60 * howOften;
   const settings = await Database.queryAllSettings();
   const startTime = parseInt(settings.startTime.substring(0, 2));

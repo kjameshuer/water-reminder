@@ -3,7 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, FlatList, View } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { addToDailyDrinkTotal } from '../helpers/Database';
+import { addToDrinkTotalToday } from '../helpers/Database';
 
 export default function InputScreen() {
 
@@ -18,11 +18,11 @@ export default function InputScreen() {
   );
 }
 const handleOnDrinkPress = async (num, type) => {
-  await addToDailyDrinkTotal(num, type)
+  await addToDrinkTotalToday(num, type)
 
 }
 const Item = ({ name, amount, type }) => {
-  console.log("typeof", typeof(name), typeof(amount), typeof(type))
+  // console.log("typeof", typeof(name), typeof(amount), typeof(type))
   return (
     <TouchableOpacity onPress={() => handleOnDrinkPress(amount, type)} style={styles.item}>
       <Text>{name}</Text>
