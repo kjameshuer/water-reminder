@@ -43,6 +43,7 @@ export const queueReminder = async (reminderTime, repeatFreq = '') => {
       icon:
         "https://cdn0.iconfinder.com/data/icons/orderdrinks/128/C_WaterGlss-512.png",
       color: "purple",
+      androidMode: "collapse",
     },
   };
 
