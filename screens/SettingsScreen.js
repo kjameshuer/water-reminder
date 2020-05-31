@@ -3,6 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import React, { useState, useEffect } from 'react';
 import { Picker, StyleSheet, Text, View, Switch, TextInput } from 'react-native';
 import { queryAllSettings, updateSettings } from '../helpers/Database';
+import * as Reminders from '../helpers/Reminders';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
 const SettingsScreen = () => {
@@ -15,21 +16,22 @@ const SettingsScreen = () => {
         //getSettings
         //toggleUpdated(true)
         const asyncFunction = async () => {
-
-            // await call to data base
             const fetchedSettings = await queryAllSettings();
             setSettings(fetchedSettings)
         }
         asyncFunction()
-       
     }, [])
 
     useEffect(() => {
- 
         clearTimeout(timeout)
         const asyncFunction = async () => {
-            // await call to data base
             await updateSettings(settings.id, settings);
+            await Reminders.deleteAllQueuedReminders();
+            if (settings.frequency !== 'never') {
+                hours = parseInt(settings.frequency.substring(0, 1));
+                await Reminders.queueNonRecurringTodayReminders(hours);
+                await Reminders.queueRecurringTomorrowReminders(hours);
+            }
         }
 
         updateTimeout(setTimeout(() => {
@@ -72,7 +74,7 @@ const SettingsScreen = () => {
                             setSettings({ ...settings, frequency: itemValue })
                         }}
                     >
-                        <Picker.Item label="Let the app decide!" value="auto" />
+                        <Picker.Item label="Never" value="never" />
                         <Picker.Item label="Hourly" value="1h" />
                         <Picker.Item label="Every 3 hours" value="3h" />
                     </Picker>
@@ -112,6 +114,31 @@ const SettingsScreen = () => {
                         <Picker.Item label="9pm" value="21:00:00" />
                         <Picker.Item label="10pm" value="22:00:00" />
                     </Picker>
+
+                <Text>End Time</Text>
+                <Picker
+                    selectedValue={settings.endTime}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(itemValue, itemIndex) => {
+                        setSettings({ ...settings, endTime: itemValue })
+                    }}
+                >
+                    <Picker.Item label="8am" value="08:00:00" />
+                    <Picker.Item label="9am" value="09:00:00" />
+                    <Picker.Item label="10am" value="10:00:00" />
+                    <Picker.Item label="11am" value="11:00:00" />
+                    <Picker.Item label="12pm" value="12:00:00" />
+                    <Picker.Item label="1pm" value="13:00:00" />
+                    <Picker.Item label="2pm" value="14:00:00" />
+                    <Picker.Item label="3pm" value="15:00:00" />
+                    <Picker.Item label="4pm" value="16:00:00" />
+                    <Picker.Item label="5pm" value="17:00:00" />
+                    <Picker.Item label="6pm" value="18:00:00" />
+                    <Picker.Item label="7pm" value="19:00:00" />
+                    <Picker.Item label="8pm" value="20:00:00" />
+                    <Picker.Item label="9pm" value="21:00:00" />
+                    <Picker.Item label="10pm" value="22:00:00" />
+                </Picker>
                 </View>
             }
         </>

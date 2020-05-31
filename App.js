@@ -46,13 +46,13 @@ export default function App(props) {
           "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf"),
         });
 
-        await Database.dropAndCreateTables();
+        await Database.createTables();
         let settingsId = await Database.initializeSettings();
 
         // await Database.addFakeData();
         
         Reminders.addReminderListener(handleReminder);
-        await Reminders.deleteAllQueuedReminders();
+        // await Reminders.deleteAllQueuedReminders();
         // await Reminders.queueNonRecurringTodayReminders(1);
         // await Reminders.queueRecurringTomorrowReminders(1);
 

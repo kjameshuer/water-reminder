@@ -1,6 +1,4 @@
 import { Notifications } from "expo";
-import * as Permissions from 'expo-permissions';
-import Constants from 'expo-constants';
 
 import * as Database from "./Database";
 
@@ -24,6 +22,13 @@ export const addReminderListener = (handleReminder) => {
 }
 
 export const queueReminder = async (reminderTime, repeatFreq = '') => {
+  if (Platform.OS === "android") {
+    await Notifications.createChannelAndroidAsync("water-reminder", {
+      name: "Water Reminder",
+      sound: true,
+    });
+  }
+
   const localNotification = {
     title: "Gotta Drink, Bitch",
     body: reminders[Math.floor(Math.random() * reminders.length)],
@@ -34,7 +39,7 @@ export const queueReminder = async (reminderTime, repeatFreq = '') => {
       sound: true,
     },
     android: {
-      channelId: "default",
+      channelId: "water-reminder",
       icon:
         "https://cdn0.iconfinder.com/data/icons/orderdrinks/128/C_WaterGlss-512.png",
       color: "purple",
@@ -67,7 +72,7 @@ export const queueNonRecurringTodayReminders = async (howOften) => {
   const rightNow = new Date();
   const startTime = rightNow.getHours();
   const endTime = parseInt((await Database.querySetting("endTime")).substring(0,2))
-  const occurrences = (endTime - startTime) / howOften; 
+  const occurrences = Math.floor((endTime - startTime) / howOften); 
 
   for (let i = 0; i < occurrences; i++) {
     // has to be in the future, so add 3 seconds
@@ -83,7 +88,7 @@ export const queueRecurringTomorrowReminders = async (howOften) => {
   const settings = await Database.queryAllSettings();
   const startTime = parseInt(settings.startTime.substring(0, 2));
   const endTime = parseInt(settings.endTime.substring(0, 2));
-  const occurrences = (endTime - startTime) / howOften; 
+  const occurrences = Math.floor((endTime - startTime) / howOften); 
   
   const tomorrow = new Date ()
   tomorrow.setDate(new Date().getDate() + 1);

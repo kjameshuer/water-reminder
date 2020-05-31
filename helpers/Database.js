@@ -230,6 +230,64 @@ export const dropAndCreateTables = async () => {
     return value;
 }
 
+export const createTables = async () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction(txn => {
+      txn.executeSql(
+        `create table if not exists water_entries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    drinkable VARCHAR(30),
+                    amount INTEGER,
+                    created_at DATETIME default (datetime('now','localtime'))
+                );`,
+        [],
+        (txn, res) => { },
+        (_, error) => reject("Error creating water_entries table" + error)
+      );
+      txn.executeSql(
+        `create table if not exists water_settings (
+                    id INTEGER PRIMARY KEY NOT NULL,
+                    goal INTEGER, 
+                    measurement VARCHAR(30),
+                    frequency VARCHAR(30), 
+                    sunday INTEGER(1), 
+                    monday INTEGER(1), 
+                    tuesday INTEGER(1), 
+                    wednesday INTEGER(1),
+                    thursday INTEGER(1), 
+                    friday INTEGER(1), 
+                    saturday INTEGER(1), 
+                    startTime TIME, 
+                    endTime TIME
+                );`,
+        [],
+        (txn, res) => {
+          console.log("tables created");
+          resolve();
+        },
+        (_, error) =>
+          reject("Error creating water_settings table " + error)
+      );
+
+      txn.executeSql(
+        `create table if not exists water_types (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  name VARCHAR(30),
+                  drinkable VARCHAR(30),
+                  amount INTEGER
+              );`,
+        [],
+        (txn, res) => { },
+        (_, error) => reject("Error creating water_types table" + error)
+      );
+
+    });
+  })
+
+  const value = await promise;
+  return value;
+}
+
 export const initializeSettings = async () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction(
@@ -246,7 +304,7 @@ export const initializeSettings = async () => {
                             sunday, monday, tuesday, wednesday, thursday, friday, saturday, 
                             startTime, endTime 
                         ) values (
-                            '1000.0', 'ml', 'auto', 
+                            '1000.0', 'ml', '1h', 
                             1, 1, 1, 1, 1, 1, 1, 
                             time('08:00:00'), time('22:00:00')
                         )`,

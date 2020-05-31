@@ -1,4 +1,3 @@
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { ProgressCircle } from 'react-native-svg-charts'
@@ -15,9 +14,6 @@ export default function HomeScreen({navigation,route}) {
   const [sum, setSum] = React.useState(0)
   const [goal, setGoal] = React.useState(0)
 
-
-
-
   React.useEffect(() => {
     setAmount(0)
     const getGoal = async () => {
@@ -32,8 +28,6 @@ export default function HomeScreen({navigation,route}) {
       setGoal(theGoal);
       const sum = await addToDailyDrinkTotal(0, 'glass')
      
-      console.log("the Sum", sum)
-      console.log('amount', Math.floor(amount * 100))
       setAmount(sum / theGoal.toFixed(1));
       setSum(sum)
     }
